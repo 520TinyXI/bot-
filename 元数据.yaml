@@ -1,5 +1,0 @@
-name: astrbot_plugin_pet
-description: "一个简单的的群内宠物养成插件，支持LLM随机事件、PVP对决和图片状态卡。"
-version: v1.0
-author: DITF16
-repo: https://github.com/DITF16/astrbot_plugin_pet
