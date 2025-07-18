@@ -1,4 +1,4 @@
-# AstrBot 简易群宠物游戏插件
+# AstrBot 群宠物游戏插件
 
 一款功能简单的群聊宠物养成对战插件，专为 [AstrBot](https://github.com/AstrBotDevs/AstrBot) 框架设计。
 它集宠物养成、随机冒险、属性克制、PVP对战和商店系统于一体，能一定程度地提升群组的活跃度和趣味性。
