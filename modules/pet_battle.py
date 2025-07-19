@@ -119,7 +119,7 @@ class BattleManager:
             "money": money_gain
         })
         
-        return "\n".join(result)
+        return event.plain_result("\n".join(result))
     
     def _run_battle(self, pet1: dict, pet2: dict) -> tuple[list[str], str]:
         """执行战斗逻辑"""
