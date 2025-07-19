@@ -1,6 +1,8 @@
 from astrbot.api.event import filter, AstrMessageEvent
 from astrbot.api.star import Context, Star, register
 from astrbot.api import logger
+from astrbot.core.message.components import At
+from astrbot.core.platform.sources.aiocqhttp.aiocqhttp_message_event import AiocqhttpMessageEvent
 
 from core.database_manager import DatabaseManager
 from core.state_manager import StateManager
@@ -54,7 +56,10 @@ class PetPlugin(Star):
             yield event.plain_result("你还没有宠物，发送 /领养宠物 开始")
             return
         
-        result = self.image_gen.generate_pet_status_image(pet, event.get_sender_name())
+        # 安全获取发送者名称
+        sender_name = event.get_sender_name() or "主人"
+        
+        result = self.image_gen.generate_pet_status_image(pet, sender_name)
         if isinstance(result, str):
             yield event.plain_result(result)
         else:
@@ -67,7 +72,7 @@ class PetPlugin(Star):
         yield event.plain_result("\n".join(result))
 
     @filter.command("对决")
-    async def duel_pet(self, event: AstrMessageEvent):
+    async def duel_pet(self, event: AiocqhttpMessageEvent):
         user_id, group_id = event.get_sender_id(), event.get_group_id()
         result = await self.duel_sys.handle_duel(event, user_id, group_id)
         yield event.plain_result("\n".join(result))
@@ -103,19 +108,53 @@ class PetPlugin(Star):
 
     @filter.command("宠物菜单")
     async def pet_menu(self, event: AstrMessageEvent):
-        menu = (
-            "🐾 宠物游戏菜单 🐾\n"
-            "/领养宠物 - 领养新宠物\n"
-            "/我的宠物 - 查看宠物状态\n"
-            "/散步 - 带宠物外出\n"
-            "/对决 @某人 - 挑战其他玩家\n"
-            "/宠物进化 - 进化宠物\n"
-            "/宠物商店 - 查看商店\n"
-            "/宠物背包 - 查看背包\n"
-            "/购买 [物品] [数量] - 购买物品\n"
-            "/投喂 [物品] - 喂养宠物"
-        )
-        yield event.plain_result(menu)
+        menu_text = """--- 🐾 宠物插件帮助菜单 🐾 ---
+
+    【核心功能】
+    /领养宠物 [宠物名字]
+    功能：随机领养一只初始宠物并为它命名。
+    用法示例：/领养宠物 豆豆
+
+    /我的宠物
+    功能：以图片形式查看你当前宠物的详细状态。
+
+    /宠物进化
+    功能：当宠物达到指定等级时，让它进化成更强的形态。
+
+    /宠物背包
+    功能：查看你拥有的所有物品和对应的数量。
+
+    【冒险与对战】
+    /散步
+    功能：带宠物外出散步，可能会触发奇遇、获得奖励或遭遇野生宠物。
+
+    /对决 @某人
+    功能：与群内其他玩家的宠物进行一场1v1对决，有1小时冷却时间。
+
+    【商店与喂养】
+    /宠物商店
+    功能：查看所有可以购买的商品及其价格和效果。
+
+    /购买 [物品名] [数量]
+    功能：从商店购买指定数量的物品，数量为可选参数，默认为1。
+
+    /投喂 [物品名]
+    功能：从背包中使用食物来喂养你的宠物，恢复其状态。
+    """
+        yield event.plain_result(menu_text)
+
+    @staticmethod
+    def get_at(event: AiocqhttpMessageEvent) -> str | None:
+        """安全获取被@的用户ID"""
+        # 确保消息存在
+        if not hasattr(event, 'get_messages') or not callable(event.get_messages):
+            return None
+        
+        # 查找@消息
+        for seg in event.get_messages():
+            if isinstance(seg, At) and str(seg.qq) != event.get_self_id():
+                return str(seg.qq)
+        return None
 
     async def terminate(self):
         self.db.close()
