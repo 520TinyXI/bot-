@@ -1,8 +1,9 @@
 import sqlite3
 import logging
+import random
 from pathlib import Path
-from datetime import datetime
-from ..constants import PET_TYPES, SHOP_ITEMS
+from datetime import datetime, timedelta
+from ..constants import PET_TYPES, SHOP_ITEMS, STAT_MAP
 
 logger = logging.getLogger(__name__)
 
@@ -55,7 +56,7 @@ class DatabaseManager:
         pet_name = pet_name or pet_type
         
         now = datetime.now().isoformat()
-        cooldown_time = (now - timedelta(hours=2)).isoformat()
+        cooldown_time = (datetime.now() - timedelta(hours=2)).isoformat()
         
         with sqlite3.connect(self.db_path) as conn:
             conn.execute(
@@ -127,4 +128,5 @@ class DatabaseManager:
     
     def close(self):
         """关闭数据库连接"""
+        # 不需要额外操作，SQLite连接会自动关闭
         pass
