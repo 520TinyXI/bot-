@@ -4,14 +4,15 @@ from astrbot.api import logger
 from astrbot.core.message.components import At
 from astrbot.core.platform.sources.aiocqhttp.aiocqhttp_message_event import AiocqhttpMessageEvent
 
-from core.database_manager import DatabaseManager
-from core.state_manager import StateManager
-from core.image_generator import ImageGenerator
-from systems.battle_system import BattleSystem
-from systems.walk_system import WalkSystem
-from systems.shop_system import ShopSystem
-from systems.evolution_system import EvolutionSystem
-from systems.duel_system import DuelSystem
+# 确保导入路径正确
+from .core.database_manager import DatabaseManager
+from .core.state_manager import StateManager
+from .core.image_generator import ImageGenerator
+from .systems.battle_system import BattleSystem
+from .systems.walk_system import WalkSystem
+from .systems.shop_system import ShopSystem
+from .systems.evolution_system import EvolutionSystem
+from .systems.duel_system import DuelSystem
 
 @register(
     "简易群宠物游戏",
@@ -23,7 +24,7 @@ from systems.duel_system import DuelSystem
 class PetPlugin(Star):
     def __init__(self, context: Context):
         super().__init__(context)
-        # 初始化核心模块
+        # 初始化核心模块 - 确保使用相对路径
         self.db = DatabaseManager()
         self.state_mgr = StateManager(self.db)
         self.image_gen = ImageGenerator()
@@ -157,5 +158,8 @@ class PetPlugin(Star):
         return None
 
     async def terminate(self):
-        self.db.close()
+        """插件卸载/停用时调用"""
+        # 关闭数据库连接
+        if hasattr(self, 'db') and self.db:
+            self.db.close()
         logger.info("宠物游戏插件已卸载")
