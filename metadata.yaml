@@ -1,5 +1,5 @@
 name: TinyXI
-description: "群内宠物养成插件，支持LLM随机事件、PVP对决和图片状态卡。"
+description: "群内宠物养成插件，随机事件、PVP对决和图片状态卡。"
 version: v1.0
 author: XI
 repo: https://github.com/520TinyXI/bot211.git
