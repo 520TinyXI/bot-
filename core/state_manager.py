@@ -1,9 +1,8 @@
 import random
 from datetime import datetime, timedelta
-from .database_manager import DatabaseManager
 
 class StateManager:
-    def __init__(self, db: DatabaseManager):
+    def __init__(self, db):
         self.db = db
     
     def get_pet_with_decay(self, user_id, group_id):
@@ -12,7 +11,7 @@ class StateManager:
             return None
         
         now = datetime.now()
-        last_updated = datetime.fromisoformat(pet['last_updated_time'])
+        last_updated = datetime.fromisoformat(pet['last_updated_time']) if pet['last_updated_time'] else now
         
         # 计算离线衰减
         hours_passed = (now - last_updated).total_seconds() / 3600
