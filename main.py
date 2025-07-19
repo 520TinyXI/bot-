@@ -161,7 +161,8 @@ class PetPlugin(Star):
             "/宠物背包 - 查看背包\n"
             "/投喂 [物品] - 喂养宠物"
         )
-        yield event.plain_result(menu)
+        # 修复：直接返回结果而不是使用 yield
+        return event.plain_result(menu)
 
     @staticmethod
     def get_at(event: AiocqhttpMessageEvent) -> str | None:
