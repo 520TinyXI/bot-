@@ -10,8 +10,8 @@ class DuelSystem:
         if not group_id:
             return ["该功能仅限群聊使用"]
         
-        # 获取被@的用户
-        target_id = self._get_at_user(event)
+        # 获取被@的用户 - 使用修复后的get_at方法
+        target_id = PetPlugin.get_at(event)
         if not target_id:
             return ["请@一位你想对决的群友"]
         
@@ -26,6 +26,12 @@ class DuelSystem:
             return ["你还没有宠物，无法对决"]
         if not target_pet:
             return ["对方还没有宠物"]
+        
+        # 确保宠物数据完整
+        if 'pet_name' not in challenger_pet:
+            challenger_pet['pet_name'] = "你的宠物"
+        if 'pet_name' not in target_pet:
+            target_pet['pet_name'] = "对方的宠物"
         
         now = datetime.now()
         
@@ -63,10 +69,6 @@ class DuelSystem:
         )
         
         return result
-    
-    def _get_at_user(self, event):
-        # 简化实现，实际应根据平台实现
-        return event.message_str.split()[-1] if '@' in event.message_str else None
     
     def _check_cooldown(self, pet_data, now):
         last_duel = datetime.fromisoformat(pet_data['last_duel_time'])
